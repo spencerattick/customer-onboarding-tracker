@@ -15,12 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Plus, Settings, Trash2, Building2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-
-interface Account {
-  id: string
-  name: string
-  createdAt: string
-}
+import { Account } from "@/lib/types"
 
 interface AccountSelectorProps {
   selectedAccount: Account | null
