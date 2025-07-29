@@ -252,47 +252,6 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-
-          {/* Quick Actions */}
-          <div className="mt-12">
-            <Card>
-              <CardHeader>
-                {/* <CardTitle>Quick Actions</CardTitle> */}
-                <H2>Quick Actions</H2>
-                <CardDescription>
-                  Get started with {selectedAccount.name}'s 8-week journey
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex flex-col sm:flex-row gap-4">
-                {!startDate && (
-                  <div className="flex-1 p-4 border border-dashed rounded-lg">
-                    <h3 className="font-medium mb-2">Set Start Date</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Choose when {selectedAccount.name}'s 8-week journey begins
-                      to track progress accurately.
-                    </p>
-                    <StartDatePicker
-                      startDate={startDate}
-                      onStartDateChange={handleStartDateChange}
-                    />
-                  </div>
-                )}
-                <div className="flex-1 p-4 border border-dashed rounded-lg">
-                  <h3 className="font-medium mb-2">Add First Goal</h3>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Start by adding a goal to any week in {selectedAccount.name}
-                    's timeline.
-                  </p>
-                  <Button asChild>
-                    <Link href={`/week/1?account=${selectedAccount.id}`}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Goal to Week 1
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>
