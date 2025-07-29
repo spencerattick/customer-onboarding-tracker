@@ -17,6 +17,7 @@ import { TimelineWeek } from "@/components/timeline-week";
 import { AccountSelector } from "@/components/account-selector";
 import Header from "@/components/header";
 import H2 from "@/components/h2";
+import InfoHeader from "@/components/info-header";
 
 interface Goal {
   id: string;
@@ -139,7 +140,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
-        <h1 className="text-center text-4xl font-bold mb-5">{selectedAccount.name}</h1>
+        <InfoHeader selectedAccount={selectedAccount} />
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
