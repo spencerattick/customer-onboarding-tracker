@@ -16,6 +16,7 @@ import { StartDatePicker } from "@/components/start-date-picker";
 import { TimelineWeek } from "@/components/timeline-week";
 import { AccountSelector } from "@/components/account-selector";
 import Header from "@/components/header";
+import H2 from "@/components/h2";
 
 interface Goal {
   id: string;
@@ -138,16 +139,13 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
+        <h1 className="text-center text-4xl font-bold mb-5">{selectedAccount.name}</h1>
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight">
-                  {selectedAccount
-                    ? `${selectedAccount.name} - 8-Week Timeline`
-                    : "8-Week Timeline Dashboard"}
-                </h1>
+                <H2>8-Week Overview</H2>
                 <p className="text-muted-foreground mt-2">
                   Track progress through an 8-week journey of goal achievement
                 </p>
@@ -233,7 +231,8 @@ export default function Dashboard() {
           {/* Timeline */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-semibold">Timeline Overview</h2>
+              {/* <h2 className="text-2xl font-semibold">Timeline Overview</h2> */}
+              <H2>Timeline Overview</H2>
               <p className="text-sm text-muted-foreground">
                 Click on any week to manage goals
               </p>
@@ -257,7 +256,8 @@ export default function Dashboard() {
           <div className="mt-12">
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+                {/* <CardTitle>Quick Actions</CardTitle> */}
+                <H2>Quick Actions</H2>
                 <CardDescription>
                   Get started with {selectedAccount.name}'s 8-week journey
                 </CardDescription>
