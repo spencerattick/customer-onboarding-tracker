@@ -10,6 +10,8 @@ import { ProgressBar } from "@/components/progress-bar"
 import { GoalForm } from "@/components/goal-form"
 import { GoalCard } from "@/components/goal-card"
 import { AccountSelector } from "@/components/account-selector"
+import { Account } from "@/lib/types"
+import Header from "@/components/header"
 
 interface Goal {
   id: string
@@ -17,12 +19,6 @@ interface Goal {
   title: string
   description: string
   completed: boolean
-  createdAt: string
-}
-
-interface Account {
-  id: string
-  name: string
   createdAt: string
 }
 
@@ -178,7 +174,7 @@ export default function WeekPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Fixed Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border border-red-600">
         <div className="container mx-auto px-4 py-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <AccountSelector selectedAccount={selectedAccount} onAccountChange={handleAccountChange} />
@@ -186,6 +182,8 @@ export default function WeekPage() {
           </div>
         </div>
       </div>
+
+      {/* <Header selectedAccount={selectedAccount} startDate={startDate} handleAccountChange={handleAccountChange}/> */}
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
