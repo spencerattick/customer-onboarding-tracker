@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -10,81 +16,98 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Plus, Settings, Trash2, Building2 } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Account } from "@/lib/types"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Plus, Settings, Trash2, Building2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Account } from "@/lib/types";
+import { addAccountToDb } from "@/lib/server-actions";
 
 interface AccountSelectorProps {
-  selectedAccount: Account | null
-  onAccountChange: (account: Account | null) => void
+  selectedAccount: Account | null;
+  onAccountChange: (account: Account | null) => void;
 }
 
-export function AccountSelector({ selectedAccount, onAccountChange }: AccountSelectorProps) {
-  const [accounts, setAccounts] = useState<Account[]>([])
-  const [showAddDialog, setShowAddDialog] = useState(false)
-  const [showManageDialog, setShowManageDialog] = useState(false)
-  const [newAccountName, setNewAccountName] = useState("")
+export function AccountSelector({
+  selectedAccount,
+  onAccountChange,
+}: AccountSelectorProps) {
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showManageDialog, setShowManageDialog] = useState(false);
+  const [newAccountName, setNewAccountName] = useState("");
 
   useEffect(() => {
-    loadAccounts()
-  }, [])
+    loadAccounts();
+  }, []);
 
   const loadAccounts = () => {
-    const savedAccounts = localStorage.getItem("timeline-accounts")
+    const savedAccounts = localStorage.getItem("timeline-accounts");
     if (savedAccounts) {
-      const parsedAccounts = JSON.parse(savedAccounts)
-      setAccounts(parsedAccounts)
+      const parsedAccounts = JSON.parse(savedAccounts);
+      setAccounts(parsedAccounts);
 
       // If no account is selected but accounts exist, select the first one
       if (!selectedAccount && parsedAccounts.length > 0) {
-        onAccountChange(parsedAccounts[0])
+        onAccountChange(parsedAccounts[0]);
       }
     }
-  }
+  };
 
   const saveAccounts = (updatedAccounts: Account[]) => {
-    localStorage.setItem("timeline-accounts", JSON.stringify(updatedAccounts))
-    setAccounts(updatedAccounts)
-  }
+    localStorage.setItem("timeline-accounts", JSON.stringify(updatedAccounts));
+    console.log("Accounts saved:", updatedAccounts);
+    setAccounts(updatedAccounts);
+  };
 
-  const handleAddAccount = () => {
-    if (!newAccountName.trim()) return
-
-    const newAccount: Account = {
-      id: Date.now().toString(),
-      name: newAccountName.trim(),
-      createdAt: new Date().toISOString(),
+  const handleAddAccount = async () => {
+    if (!newAccountName.trim()) return;
+  
+    try {
+      const newAccount = await addAccountToDb(newAccountName.trim());
+      
+      const updatedAccounts = [
+        ...accounts,
+        {
+          ...newAccount,
+          createdAt: newAccount.createdAt.toISOString(),
+        },
+      ];
+      saveAccounts(updatedAccounts);
+      onAccountChange({
+        ...newAccount,
+        createdAt: newAccount.createdAt.toISOString(),
+      });
+      setNewAccountName("");
+      setShowAddDialog(false);
+    } catch (error) {
+      console.error("Error creating account:", error);
     }
-
-    const updatedAccounts = [...accounts, newAccount]
-    saveAccounts(updatedAccounts)
-    onAccountChange(newAccount)
-    setNewAccountName("")
-    setShowAddDialog(false)
-  }
+  };
 
   const handleDeleteAccount = (accountId: string) => {
-    const updatedAccounts = accounts.filter((account) => account.id !== accountId)
-    saveAccounts(updatedAccounts)
+    const updatedAccounts = accounts.filter(
+      (account) => account.id !== accountId
+    );
+    saveAccounts(updatedAccounts);
 
     // Clear account-specific data
-    localStorage.removeItem(`timeline-goals-${accountId}`)
-    localStorage.removeItem(`timeline-start-date-${accountId}`)
+    localStorage.removeItem(`timeline-goals-${accountId}`);
+    localStorage.removeItem(`timeline-start-date-${accountId}`);
 
     // If the deleted account was selected, select another one or null
     if (selectedAccount?.id === accountId) {
-      const newSelectedAccount = updatedAccounts.length > 0 ? updatedAccounts[0] : null
-      onAccountChange(newSelectedAccount)
+      const newSelectedAccount =
+        updatedAccounts.length > 0 ? updatedAccounts[0] : null;
+      onAccountChange(newSelectedAccount);
     }
-  }
+  };
 
   const handleAccountSelect = (accountId: string) => {
-    const account = accounts.find((acc) => acc.id === accountId)
-    onAccountChange(account || null)
-  }
+    const account = accounts.find((acc) => acc.id === accountId);
+    onAccountChange(account || null);
+  };
 
   return (
     <div className="flex items-center gap-2">
@@ -93,7 +116,10 @@ export function AccountSelector({ selectedAccount, onAccountChange }: AccountSel
         <span className="text-sm font-medium">Account:</span>
       </div>
 
-      <Select value={selectedAccount?.id || ""} onValueChange={handleAccountSelect}>
+      <Select
+        value={selectedAccount?.id || ""}
+        onValueChange={handleAccountSelect}
+      >
         <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Select account..." />
         </SelectTrigger>
@@ -116,7 +142,9 @@ export function AccountSelector({ selectedAccount, onAccountChange }: AccountSel
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Account</DialogTitle>
-            <DialogDescription>Create a new account to track progress separately.</DialogDescription>
+            <DialogDescription>
+              Create a new account to track progress separately.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -128,7 +156,7 @@ export function AccountSelector({ selectedAccount, onAccountChange }: AccountSel
                 placeholder="Enter account name..."
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    handleAddAccount()
+                    handleAddAccount();
                   }
                 }}
                 autoFocus
@@ -157,7 +185,8 @@ export function AccountSelector({ selectedAccount, onAccountChange }: AccountSel
             <DialogHeader>
               <DialogTitle>Manage Accounts</DialogTitle>
               <DialogDescription>
-                View and delete existing accounts. Deleting an account will remove all its data.
+                View and delete existing accounts. Deleting an account will
+                remove all its data.
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -167,7 +196,8 @@ export function AccountSelector({ selectedAccount, onAccountChange }: AccountSel
                     <div>
                       <h4 className="font-medium">{account.name}</h4>
                       <p className="text-sm text-muted-foreground">
-                        Created {new Date(account.createdAt).toLocaleDateString()}
+                        Created{" "}
+                        {new Date(account.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                     <Button
@@ -186,5 +216,5 @@ export function AccountSelector({ selectedAccount, onAccountChange }: AccountSel
         </Dialog>
       )}
     </div>
-  )
+  );
 }
