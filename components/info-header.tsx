@@ -2,7 +2,9 @@
 
 import { Account } from "@/lib/types";
 import { Pencil } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
+import AccountNotes from "./account-notes";
 
 export default function InfoHeader({
   selectedAccount,
@@ -11,30 +13,41 @@ export default function InfoHeader({
 }) {
   const [teamId, setTeamId] = useState<string | null>(null);
   const [linkedNotionDoc, setLinkedNotionDoc] = useState<string | null>(null);
-  const [generalNotes, setGeneralNotes] = useState<string | null>(null);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editValue, setEditValue] = useState("");
+  const [generalNotes, setGeneralNotes] = useState<String[] | []>([]);
+  
+  // State for Team ID editing
+  const [isEditingTeamId, setIsEditingTeamId] = useState(false);
+  const [teamIdInput, setTeamIdInput] = useState("");
 
-  const accountInfo = [teamId, linkedNotionDoc, generalNotes];
-  const setters = [setTeamId, setLinkedNotionDoc, setGeneralNotes];
-  const labels = ["Team ID", "Linked Notion Doc", "General Notes"];
+  // State for Notion Doc editing
+  const [isEditingNotionDoc, setIsEditingNotionDoc] = useState(false);
+  const [notionDocInput, setNotionDocInput] = useState("");
 
-  const handleEditStart = (index: number) => {
-    setEditingIndex(index);
-    setEditValue(accountInfo[index] || "");
+  const handleTeamIdEdit = () => {
+    setIsEditingTeamId(true);
+    setTeamIdInput(teamId || "");
   };
 
-  const handleEditSave = (index: number) => {
-    setters[index](editValue);
-    setEditingIndex(null);
-    setEditValue("");
+  const handleTeamIdSave = () => {
+    setTeamId(teamIdInput);
+    setIsEditingTeamId(false);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+  const handleNotionDocEdit = () => {
+    setIsEditingNotionDoc(true);
+    setNotionDocInput(linkedNotionDoc || "");
+  };
+
+  const handleNotionDocSave = () => {
+    setLinkedNotionDoc(notionDocInput);
+    setIsEditingNotionDoc(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, field: 'teamId' | 'notionDoc') => {
     if (e.key === "Enter") {
-      handleEditSave(index);
+      field === 'teamId' ? handleTeamIdSave() : handleNotionDocSave();
     } else if (e.key === "Escape") {
-      setEditingIndex(null);
+      field === 'teamId' ? setIsEditingTeamId(false) : setIsEditingNotionDoc(false);
     }
   };
 
@@ -45,31 +58,73 @@ export default function InfoHeader({
       </h1>
 
       <div className="w-full flex justify-center items-center gap-8">
-        {accountInfo.map((info, index) => (
-          <div key={index} className="flex items-center">
-            {editingIndex === index ? (
-              <input
-                type="text"
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
-                onBlur={() => handleEditSave(index)}
-                autoFocus
-                className="border rounded px-2 py-1 text-sm"
+        {/* Team ID Field */}
+        <div className="flex items-center">
+          {isEditingTeamId ? (
+            <input
+              type="text"
+              value={teamIdInput}
+              onChange={(e) => setTeamIdInput(e.target.value)}
+              onBlur={handleTeamIdSave}
+              onKeyDown={(e) => handleKeyDown(e, 'teamId')}
+              autoFocus
+              className="border rounded px-2 py-1 text-sm"
+            />
+          ) : (
+            <>
+              <p>TeamId: {teamId || "Not set"}</p>
+              <Pencil
+                className="h-3 w-3 ml-1 cursor-pointer"
+                onClick={handleTeamIdEdit}
               />
-            ) : (
-              <>
-                <span>
-                  {labels[index]}: {info || "Not set"}
-                </span>
-                <Pencil
-                  className="h-2 w-2 ml-1 cursor-pointer"
-                  onClick={() => handleEditStart(index)}
-                />
-              </>
-            )}
-          </div>
-        ))}
+            </>
+          )}
+        </div>
+        
+        {/* Linked Notion Doc Field */}
+        <div className="flex items-center">
+          {isEditingNotionDoc ? (
+            <input
+              type="url"
+              value={notionDocInput}
+              onChange={(e) => setNotionDocInput(e.target.value)}
+              onBlur={handleNotionDocSave}
+              onKeyDown={(e) => handleKeyDown(e, 'notionDoc')}
+              autoFocus
+              className="border rounded px-2 py-1 text-sm"
+              placeholder="https://notion.so/..."
+            />
+          ) : linkedNotionDoc ? (
+            <>
+              <Link href={linkedNotionDoc} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                Linked Notion Doc
+              </Link>
+              <Pencil
+                className="h-3 w-3 ml-1 cursor-pointer"
+                onClick={handleNotionDocEdit}
+              />
+            </>
+          ) : (
+            <>
+              <p>Linked Notion Doc: Not set</p>
+              <Pencil
+                className="h-3 w-3 ml-1 cursor-pointer"
+                onClick={handleNotionDocEdit}
+              />
+            </>
+          )}
+        </div>
+        
+        {/* Notes Field */}
+        <div>
+          {generalNotes ? <p>Notes: Not set</p> : <AccountNotes />}
+          <Pencil
+            className="h-3 w-3 mr-1 cursor-pointer"
+            onClick={() => {
+              console.log(`clicked`);
+            }}
+          />
+        </div>
       </div>
     </div>
   );
