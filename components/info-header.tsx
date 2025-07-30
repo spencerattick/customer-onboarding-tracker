@@ -116,7 +116,7 @@ export default function InfoHeader({
         </div>
         
         {/* Notes Field */}
-        <div>
+        {/* <div>
           {generalNotes ? <p>Notes: Not set</p> : <AccountNotes />}
           <Pencil
             className="h-3 w-3 mr-1 cursor-pointer"
@@ -124,7 +124,7 @@ export default function InfoHeader({
               console.log(`clicked`);
             }}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
