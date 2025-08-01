@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Settings, Trash2, Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Account } from "@/lib/types";
-import { addAccountToDb } from "@/lib/server-actions";
+import { addAccountToDb, getAllAccounts } from "@/lib/server-actions";
 
 interface AccountSelectorProps {
   selectedAccount: Account | null;
@@ -42,15 +42,15 @@ export function AccountSelector({
     loadAccounts();
   }, []);
 
-  const loadAccounts = () => {
-    const savedAccounts = localStorage.getItem("timeline-accounts");
+  const loadAccounts = async () => {
+    // const savedAccounts = localStorage.getItem("timeline-accounts");
+    const savedAccounts = await getAllAccounts()
     if (savedAccounts) {
-      const parsedAccounts = JSON.parse(savedAccounts);
-      setAccounts(parsedAccounts);
+      setAccounts(savedAccounts);
 
       // If no account is selected but accounts exist, select the first one
-      if (!selectedAccount && parsedAccounts.length > 0) {
-        onAccountChange(parsedAccounts[0]);
+      if (!selectedAccount && savedAccounts.length > 0) {
+        onAccountChange(savedAccounts[0]);
       }
     }
   };
