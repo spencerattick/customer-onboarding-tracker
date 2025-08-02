@@ -8,10 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Target, TrendingUp, Building2 } from "lucide-react";
-import Link from "next/link";
-import { ProgressBar } from "@/components/progress-bar";
+import { Calendar, Target, TrendingUp, Building2 } from "lucide-react";
 import { StartDatePicker } from "@/components/start-date-picker";
 import { TimelineWeek } from "@/components/timeline-week";
 import { AccountSelector } from "@/components/account-selector";
@@ -42,6 +39,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (selectedAccount) {
       loadAccountData(selectedAccount.id);
+      console.log('SELECTED ACCOUNT PAGE:', selectedAccount);
     } else {
       // Clear data when no account is selected
       setGoals([]);

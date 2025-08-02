@@ -23,3 +23,15 @@ export const addAccountToDb = async (accountName: string) => {
         throw error;
       }
 }
+
+export const setTeamIdForAccount = async (accountId: string, teamId: string) => {
+    try {
+        return await prisma.account.update({
+            where: { id: accountId },
+            data: { teamId },
+        });
+    } catch (error) {
+        console.error("Error updating account with team ID:", error);
+        throw error;
+    }
+}
