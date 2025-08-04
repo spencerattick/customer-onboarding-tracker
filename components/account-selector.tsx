@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Settings, Trash2, Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Account } from "@/lib/types";
-import { addAccountToDb, getAllAccounts } from "@/lib/server-actions";
+import { addAccountToDb, getAccountById, getAllAccounts } from "@/lib/server-actions";
 
 interface AccountSelectorProps {
   selectedAccount: Account | null;
@@ -75,7 +75,7 @@ export function AccountSelector({
           createdAt: newAccount.createdAt.toISOString(),
         },
       ];
-      saveAccounts(updatedAccounts);
+      // saveAccounts(updatedAccounts);
       onAccountChange({
         ...newAccount,
         createdAt: newAccount.createdAt.toISOString(),
@@ -91,7 +91,7 @@ export function AccountSelector({
     const updatedAccounts = accounts.filter(
       (account) => account.id !== accountId
     );
-    saveAccounts(updatedAccounts);
+    // saveAccounts(updatedAccounts);
 
     // Clear account-specific data
     localStorage.removeItem(`timeline-goals-${accountId}`);
@@ -106,10 +106,14 @@ export function AccountSelector({
     }
   };
 
-  const handleAccountSelect = (accountId: string) => {
-    const account = accounts.find((acc) => acc.id === accountId);
-    console.log('SELECTED ACCOUNT DROPDOWN:', account);
-    onAccountChange(account || null);
+  const handleAccountSelect = async (accountId: string) => {
+    let currentAccount;
+    if (accountId) {
+      currentAccount = await getAccountById(accountId);
+    }
+    // const account = accounts.find((acc) => acc.id === accountId);
+    // console.log('SELECTED ACCOUNT DROPDOWN:', account);
+    onAccountChange(currentAccount || null);
   };
 
   return (

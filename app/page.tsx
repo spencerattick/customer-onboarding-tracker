@@ -37,6 +37,7 @@ export default function Dashboard() {
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
   useEffect(() => {
+    console.log('ACCOUNT HAS CHANGED:', selectedAccount);
     if (selectedAccount) {
       loadAccountData(selectedAccount.id);
       console.log('SELECTED ACCOUNT PAGE:', selectedAccount);

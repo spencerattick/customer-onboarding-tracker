@@ -11,6 +11,17 @@ export const getAllAccounts = async () => {
     }
 }
 
+export const getAccountById = async (accountId: string) => {
+    try {
+        return await prisma.account.findUnique({
+            where: { id: accountId },
+        });
+    } catch (error) {
+        console.error("Error fetching account by ID:", error);
+        throw error;
+    }
+}
+
 export const addAccountToDb = async (accountName: string) => {
     try {
        return await prisma.account.create({
