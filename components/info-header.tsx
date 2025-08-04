@@ -25,11 +25,6 @@ export default function InfoHeader({
   const [isEditingNotionDoc, setIsEditingNotionDoc] = useState(false);
   const [notionDocInput, setNotionDocInput] = useState("");
 
-  useEffect(() => {
-    setTeamId(selectedAccount.teamId || null);
-    setLinkedNotionDoc(selectedAccount.notionLink || null);
-  }, [selectedAccount]);
-
   const handleTeamIdEdit = () => {
     setIsEditingTeamId(true);
     setTeamIdInput(teamId || "");

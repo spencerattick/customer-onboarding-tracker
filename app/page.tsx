@@ -139,7 +139,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
-        <InfoHeader selectedAccount={selectedAccount} />
+        <InfoHeader key={selectedAccount.id} selectedAccount={selectedAccount}/>
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
