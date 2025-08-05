@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Settings, Trash2, Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Account } from "@/lib/types";
-import { addAccountToDb, getAccountById, getAllAccounts } from "@/lib/server-actions";
+import { addAccountToDb, deleteAccountFromDb, getAccountById, getAllAccounts } from "@/lib/server-actions";
 
 interface AccountSelectorProps {
   selectedAccount: Account | null;
@@ -68,13 +68,13 @@ export function AccountSelector({
     try {
       const newAccount = await addAccountToDb(newAccountName.trim());
       
-      const updatedAccounts = [
-        ...accounts,
-        {
-          ...newAccount,
-          createdAt: newAccount.createdAt.toISOString(),
-        },
-      ];
+      // const updatedAccounts = [
+      //   ...accounts,
+      //   {
+      //     ...newAccount,
+      //     createdAt: newAccount.createdAt.toISOString(),
+      //   },
+      // ];
       // saveAccounts(updatedAccounts);
       onAccountChange({
         ...newAccount,
@@ -87,22 +87,22 @@ export function AccountSelector({
     }
   };
 
-  const handleDeleteAccount = (accountId: string) => {
-    const updatedAccounts = accounts.filter(
-      (account) => account.id !== accountId
-    );
-    // saveAccounts(updatedAccounts);
-
-    // Clear account-specific data
-    localStorage.removeItem(`timeline-goals-${accountId}`);
-    localStorage.removeItem(`timeline-start-date-${accountId}`);
-
-    // If the deleted account was selected, select another one or null
-    if (selectedAccount?.id === accountId) {
-      const newSelectedAccount =
-        updatedAccounts.length > 0 ? updatedAccounts[0] : null;
-      onAccountChange(newSelectedAccount);
-      console.log('NEW SELECTED ACCOUNT:', newSelectedAccount);
+  const handleDeleteAccount = async (accountId: string) => {
+    try {
+      await deleteAccountFromDb(accountId);
+      
+      // Re-fetch the updated accounts list
+      const updatedAccounts = await getAllAccounts();
+      setAccounts(updatedAccounts);
+      
+      // Handle selection if deleted account was the currently selected one
+      if (selectedAccount?.id === accountId) {
+        onAccountChange(updatedAccounts[0] || null);
+      }
+      
+      setShowManageDialog(false);
+    } catch (error) {
+      console.error("Error deleting account:", error);
     }
   };
 

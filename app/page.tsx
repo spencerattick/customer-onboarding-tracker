@@ -36,6 +36,7 @@ export default function Dashboard() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
 
+
   useEffect(() => {
     console.log('ACCOUNT HAS CHANGED:', selectedAccount);
     if (selectedAccount) {
