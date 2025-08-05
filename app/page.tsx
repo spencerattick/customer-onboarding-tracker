@@ -15,6 +15,7 @@ import { AccountSelector } from "@/components/account-selector";
 import Header from "@/components/header";
 import H2 from "@/components/h2";
 import InfoHeader from "@/components/info-header";
+import { useAccountStore } from "./stores/store";
 
 interface Goal {
   id: string;
@@ -34,8 +35,7 @@ interface Account {
 export default function Dashboard() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-
+  const { selectedAccount } = useAccountStore();
 
   useEffect(() => {
     if (selectedAccount) {
@@ -117,7 +117,7 @@ export default function Dashboard() {
               <CardContent>
                 <AccountSelector
                   selectedAccount={selectedAccount}
-                  onAccountChange={setSelectedAccount}
+                  // onAccountChange={setSelectedAccount}
                 />
               </CardContent>
             </Card>
@@ -132,13 +132,16 @@ export default function Dashboard() {
       {/* Fixed Progress Bar */}
       <Header
         selectedAccount={selectedAccount}
-        setSelectedAccount={setSelectedAccount}
+        // setSelectedAccount={setSelectedAccount}
         startDate={startDate}
       />
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
-        <InfoHeader key={selectedAccount.id} selectedAccount={selectedAccount}/>
+        <InfoHeader
+          key={selectedAccount.id}
+          selectedAccount={selectedAccount}
+        />
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">

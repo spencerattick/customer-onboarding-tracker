@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -32,15 +32,14 @@ model Account {
   startDate  DateTime?
   notionLink String?
   teamId     String?
-
-  updatedAt DateTime @updatedAt @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
 }
 
 model Week {
   id         String   @id @default(uuid())
-  account    Account?  @relation(fields: [accountId], references: [id])
-  accountId  String?   @unique
+  account    Account? @relation(fields: [accountId], references: [id])
+  accountId  String?  @unique
   weekNumber Int
   status     String
   goals      Goal[]
@@ -49,12 +48,12 @@ model Week {
 }
 
 model Goal {
-  id         String   @id @default(uuid())
-  week       Week     @relation(fields: [weekId], references: [id])
-  title      String
-  weekId     String
+  id          String   @id @default(uuid())
+  week        Week     @relation(fields: [weekId], references: [id])
+  title       String
+  weekId      String
   description String
-  status     String
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  createdAt  DateTime @default(now()) @map("created_at")
+  status      String
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  createdAt   DateTime @default(now()) @map("created_at")
 }
