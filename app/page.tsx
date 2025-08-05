@@ -8,10 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Calendar, Plus, Target, TrendingUp, Building2 } from "lucide-react";
-import Link from "next/link";
-import { ProgressBar } from "@/components/progress-bar";
+import { Calendar, Target, TrendingUp, Building2 } from "lucide-react";
 import { StartDatePicker } from "@/components/start-date-picker";
 import { TimelineWeek } from "@/components/timeline-week";
 import { AccountSelector } from "@/components/account-selector";
@@ -38,6 +35,7 @@ export default function Dashboard() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
+
 
   useEffect(() => {
     if (selectedAccount) {
@@ -140,7 +138,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
-        <InfoHeader selectedAccount={selectedAccount} />
+        <InfoHeader key={selectedAccount.id} selectedAccount={selectedAccount}/>
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">

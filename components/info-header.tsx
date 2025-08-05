@@ -3,15 +3,16 @@
 import { Account } from "@/lib/types";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AccountNotes from "./account-notes";
+import { setTeamIdForAccount } from "@/lib/server-actions";
 
 export default function InfoHeader({
   selectedAccount,
 }: {
   selectedAccount: Account;
 }) {
-  const [teamId, setTeamId] = useState<string | null>(null);
+  const [teamId, setTeamId] = useState<string | null>(selectedAccount.teamId || null);
   const [linkedNotionDoc, setLinkedNotionDoc] = useState<string | null>(null);
   const [generalNotes, setGeneralNotes] = useState<String[] | []>([]);
   
@@ -28,9 +29,16 @@ export default function InfoHeader({
     setTeamIdInput(teamId || "");
   };
 
-  const handleTeamIdSave = () => {
+  const handleTeamIdSave = async () => {
+    try {
+      await setTeamIdForAccount(selectedAccount.id, teamIdInput);
+    } catch (error) {
+      console.error("Error saving team ID:", error);
+      return;
+    }
     setTeamId(teamIdInput);
     setIsEditingTeamId(false);
+
   };
 
   const handleNotionDocEdit = () => {

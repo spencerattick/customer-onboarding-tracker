@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Settings, Trash2, Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Account } from "@/lib/types";
-import { addAccountToDb } from "@/lib/server-actions";
+import { addAccountToDb, deleteAccountFromDb, getAccountById, getAllAccounts } from "@/lib/server-actions";
 
 interface AccountSelectorProps {
   selectedAccount: Account | null;
@@ -42,24 +42,19 @@ export function AccountSelector({
     loadAccounts();
   }, []);
 
-  const loadAccounts = () => {
-    const savedAccounts = localStorage.getItem("timeline-accounts");
+  const loadAccounts = async () => {
+    // const savedAccounts = localStorage.getItem("timeline-accounts");
+    const savedAccounts = await getAllAccounts()
     if (savedAccounts) {
-      const parsedAccounts = JSON.parse(savedAccounts);
-      setAccounts(parsedAccounts);
+      setAccounts(savedAccounts);
 
       // If no account is selected but accounts exist, select the first one
-      if (!selectedAccount && parsedAccounts.length > 0) {
-        onAccountChange(parsedAccounts[0]);
+      if (!selectedAccount && savedAccounts.length > 0) {
+        onAccountChange(savedAccounts[0]);
       }
     }
   };
 
-  const saveAccounts = (updatedAccounts: Account[]) => {
-    localStorage.setItem("timeline-accounts", JSON.stringify(updatedAccounts));
-    console.log("Accounts saved:", updatedAccounts);
-    setAccounts(updatedAccounts);
-  };
 
   const handleAddAccount = async () => {
     if (!newAccountName.trim()) return;
@@ -67,14 +62,14 @@ export function AccountSelector({
     try {
       const newAccount = await addAccountToDb(newAccountName.trim());
       
-      const updatedAccounts = [
-        ...accounts,
-        {
-          ...newAccount,
-          createdAt: newAccount.createdAt.toISOString(),
-        },
-      ];
-      saveAccounts(updatedAccounts);
+      // const updatedAccounts = [
+      //   ...accounts,
+      //   {
+      //     ...newAccount,
+      //     createdAt: newAccount.createdAt.toISOString(),
+      //   },
+      // ];
+      // saveAccounts(updatedAccounts);
       onAccountChange({
         ...newAccount,
         createdAt: newAccount.createdAt.toISOString(),
@@ -86,27 +81,32 @@ export function AccountSelector({
     }
   };
 
-  const handleDeleteAccount = (accountId: string) => {
-    const updatedAccounts = accounts.filter(
-      (account) => account.id !== accountId
-    );
-    saveAccounts(updatedAccounts);
-
-    // Clear account-specific data
-    localStorage.removeItem(`timeline-goals-${accountId}`);
-    localStorage.removeItem(`timeline-start-date-${accountId}`);
-
-    // If the deleted account was selected, select another one or null
-    if (selectedAccount?.id === accountId) {
-      const newSelectedAccount =
-        updatedAccounts.length > 0 ? updatedAccounts[0] : null;
-      onAccountChange(newSelectedAccount);
+  const handleDeleteAccount = async (accountId: string) => {
+    try {
+      await deleteAccountFromDb(accountId);
+      
+      // Re-fetch the updated accounts list
+      const updatedAccounts = await getAllAccounts();
+      setAccounts(updatedAccounts);
+      
+      // Handle selection if deleted account was the currently selected one
+      if (selectedAccount?.id === accountId) {
+        onAccountChange(updatedAccounts[0] || null);
+      }
+      
+      setShowManageDialog(false);
+    } catch (error) {
+      console.error("Error deleting account:", error);
     }
   };
 
-  const handleAccountSelect = (accountId: string) => {
-    const account = accounts.find((acc) => acc.id === accountId);
-    onAccountChange(account || null);
+  const handleAccountSelect = async (accountId: string) => {
+    let currentAccount;
+    if (accountId) {
+      currentAccount = await getAccountById(accountId);
+    }
+    // const account = accounts.find((acc) => acc.id === accountId);
+    onAccountChange(currentAccount || null);
   };
 
   return (
