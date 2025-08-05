@@ -38,10 +38,8 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    console.log('ACCOUNT HAS CHANGED:', selectedAccount);
     if (selectedAccount) {
       loadAccountData(selectedAccount.id);
-      console.log('SELECTED ACCOUNT PAGE:', selectedAccount);
     } else {
       // Clear data when no account is selected
       setGoals([]);

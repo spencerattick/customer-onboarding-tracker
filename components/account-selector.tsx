@@ -45,7 +45,6 @@ export function AccountSelector({
   const loadAccounts = async () => {
     // const savedAccounts = localStorage.getItem("timeline-accounts");
     const savedAccounts = await getAllAccounts()
-    console.log("Saved accounts:", savedAccounts);
     if (savedAccounts) {
       setAccounts(savedAccounts);
 
@@ -56,11 +55,6 @@ export function AccountSelector({
     }
   };
 
-  // const saveAccounts = (updatedAccounts: Account[]) => {
-  //   localStorage.setItem("timeline-accounts", JSON.stringify(updatedAccounts));
-  //   console.log("Accounts saved:", updatedAccounts);
-  //   setAccounts(updatedAccounts);
-  // };
 
   const handleAddAccount = async () => {
     if (!newAccountName.trim()) return;
@@ -112,7 +106,6 @@ export function AccountSelector({
       currentAccount = await getAccountById(accountId);
     }
     // const account = accounts.find((acc) => acc.id === accountId);
-    // console.log('SELECTED ACCOUNT DROPDOWN:', account);
     onAccountChange(currentAccount || null);
   };
 

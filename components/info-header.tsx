@@ -12,7 +12,6 @@ export default function InfoHeader({
 }: {
   selectedAccount: Account;
 }) {
-  console.log("Selected account in InfoHeader:", selectedAccount);
   const [teamId, setTeamId] = useState<string | null>(selectedAccount.teamId || null);
   const [linkedNotionDoc, setLinkedNotionDoc] = useState<string | null>(null);
   const [generalNotes, setGeneralNotes] = useState<String[] | []>([]);
