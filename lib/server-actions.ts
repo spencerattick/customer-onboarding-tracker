@@ -62,3 +62,16 @@ export const setTeamIdForAccount = async (
     throw error;
   }
 };
+
+export const setStartDateForAccount = async (accountId: string, startDate: Date) => {
+  try {
+    return await prisma.account.update({
+      where: { id: accountId },
+      data: { startDate },
+    });
+
+  } catch (error) {
+    console.error("Error setting start date for account:", error);
+    throw error;
+  }
+}

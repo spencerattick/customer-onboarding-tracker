@@ -1,7 +1,13 @@
 // stores/account-store.ts
-import { create } from 'zustand';
-import { Account } from '@/lib/types';
-import { addAccountToDb, deleteAccountFromDb, getAccountById, getAllAccounts } from '@/lib/server-actions';
+import { create } from "zustand";
+import { Account } from "@/lib/types";
+import {
+  addAccountToDb,
+  deleteAccountFromDb,
+  getAccountById,
+  getAllAccounts,
+  setStartDateForAccount,
+} from "@/lib/server-actions";
 
 interface AccountState {
   accounts: Account[];
@@ -9,6 +15,7 @@ interface AccountState {
   showAddDialog: boolean;
   showManageDialog: boolean;
   newAccountName: string;
+  startDate: Date | null;
   loadAccounts: () => Promise<void>;
   setSelectedAccount: (account: Account | null) => void;
   setShowAddDialog: (show: boolean) => void;
@@ -17,6 +24,11 @@ interface AccountState {
   handleAddAccount: () => Promise<void>;
   handleDeleteAccount: (accountId: string) => Promise<void>;
   handleAccountSelect: (accountId: string) => Promise<void>;
+  addStartDateToAccount: (
+    accountId: string,
+    startDate: Date | null
+  ) => Promise<void>;
+  setStartDate: (date: Date | null) => void;
 }
 
 export const useAccountStore = create<AccountState>((set, get) => ({
@@ -24,14 +36,14 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   selectedAccount: null,
   showAddDialog: false,
   showManageDialog: false,
-  newAccountName: '',
+  newAccountName: "",
 
   // Load all accounts from DB
   loadAccounts: async () => {
     const savedAccounts = await getAllAccounts();
     if (savedAccounts) {
       set({ accounts: savedAccounts });
-      
+
       // Auto-select first account if none selected
       if (!get().selectedAccount && savedAccounts.length > 0) {
         set({ selectedAccount: savedAccounts[0] });
@@ -52,16 +64,19 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
     try {
       const newAccount = await addAccountToDb(newAccountName.trim());
-      const updatedAccounts = [...accounts, {
-        ...newAccount,
-        createdAt: newAccount.createdAt.toISOString()
-      }];
-      
+      const updatedAccounts = [
+        ...accounts,
+        {
+          ...newAccount,
+          createdAt: newAccount.createdAt.toISOString(),
+        },
+      ];
+
       set({
         accounts: updatedAccounts,
         selectedAccount: updatedAccounts[updatedAccounts.length - 1],
-        newAccountName: '',
-        showAddDialog: false
+        newAccountName: "",
+        showAddDialog: false,
       });
     } catch (error) {
       console.error("Error creating account:", error);
@@ -74,13 +89,14 @@ export const useAccountStore = create<AccountState>((set, get) => ({
       await deleteAccountFromDb(accountId);
       const updatedAccounts = await getAllAccounts();
       const { selectedAccount } = get();
-      
-      set({ 
+
+      set({
         accounts: updatedAccounts,
-        selectedAccount: selectedAccount?.id === accountId 
-          ? updatedAccounts[0] || null 
-          : selectedAccount,
-        showManageDialog: false 
+        selectedAccount:
+          selectedAccount?.id === accountId
+            ? updatedAccounts[0] || null
+            : selectedAccount,
+        showManageDialog: false,
       });
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -89,9 +105,18 @@ export const useAccountStore = create<AccountState>((set, get) => ({
 
   // Select account
   handleAccountSelect: async (accountId) => {
-    const account = accountId 
-      ? await getAccountById(accountId) 
-      : null;
+    const account = accountId ? await getAccountById(accountId) : null;
     set({ selectedAccount: account });
-  }
+  },
+
+  // Add account startDate to db
+  addStartDateToAccount: async (accountId: string, startDate: Date) => {
+    try {
+      await setStartDateForAccount(accountId, startDate);
+    } catch (error) {
+      console.error("Error updating account with start date:", error);
+      throw error;
+    }
+  },
+  setStartDate: (date) => set({ startDate: date }),
 }));
