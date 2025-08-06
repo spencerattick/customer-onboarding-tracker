@@ -15,6 +15,7 @@ import { AccountSelector } from "@/components/account-selector";
 import Header from "@/components/header";
 import H2 from "@/components/h2";
 import InfoHeader from "@/components/info-header";
+import { useAccountStore } from "./stores/store";
 
 interface Goal {
   id: string;
@@ -33,17 +34,13 @@ interface Account {
 
 export default function Dashboard() {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null);
-
+  // const [startDate, setStartDate] = useState<Date | null>(null);
+  const { selectedAccount, startDate, addStartDateToAccount } =
+    useAccountStore();
 
   useEffect(() => {
     if (selectedAccount) {
       loadAccountData(selectedAccount.id);
-    } else {
-      // Clear data when no account is selected
-      setGoals([]);
-      setStartDate(null);
     }
   }, [selectedAccount]);
 
@@ -57,24 +54,24 @@ export default function Dashboard() {
     }
 
     // Load start date for this account
-    const savedStartDate = localStorage.getItem(
-      `timeline-start-date-${accountId}`
-    );
-    if (savedStartDate) {
-      setStartDate(new Date(savedStartDate));
-    } else {
-      setStartDate(null);
-    }
+    // const savedStartDate = localStorage.getItem(
+    //   `timeline-start-date-${accountId}`
+    // );
+    // if (savedStartDate) {
+    //   setStartDate(new Date(savedStartDate));
+    // } else {
+    //   setStartDate(null);
+    // }
   };
 
-  const handleStartDateChange = (date: Date | null) => {
-    setStartDate(date);
-    if (selectedAccount && date) {
-      localStorage.setItem(
-        `timeline-start-date-${selectedAccount.id}`,
-        date.toISOString()
-      );
-    }
+  const handleStartDateChange = async (date: Date | null) => {
+    await addStartDateToAccount(selectedAccount.id, date);
+    // if (selectedAccount && date) {
+    //   localStorage.setItem(
+    //     `timeline-start-date-${selectedAccount.id}`,
+    //     date.toISOString()
+    //   );
+    // }
   };
 
   const getWeekGoals = (week: number) => {
@@ -117,7 +114,7 @@ export default function Dashboard() {
               <CardContent>
                 <AccountSelector
                   selectedAccount={selectedAccount}
-                  onAccountChange={setSelectedAccount}
+                  // onAccountChange={setSelectedAccount}
                 />
               </CardContent>
             </Card>
@@ -132,13 +129,16 @@ export default function Dashboard() {
       {/* Fixed Progress Bar */}
       <Header
         selectedAccount={selectedAccount}
-        setSelectedAccount={setSelectedAccount}
+        // setSelectedAccount={setSelectedAccount}
         startDate={startDate}
       />
 
       {/* Main Content */}
       <div className="pt-20 pb-8">
-        <InfoHeader key={selectedAccount.id} selectedAccount={selectedAccount}/>
+        <InfoHeader
+          key={selectedAccount.id}
+          selectedAccount={selectedAccount}
+        />
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="mb-8">
@@ -149,12 +149,7 @@ export default function Dashboard() {
                   Track progress through an 8-week journey of goal achievement
                 </p>
               </div>
-              {selectedAccount && (
-                <StartDatePicker
-                  startDate={startDate}
-                  onStartDateChange={handleStartDateChange}
-                />
-              )}
+              {selectedAccount && <StartDatePicker selectedAccount={selectedAccount}/>}
             </div>
           </div>
 
